@@ -17,29 +17,55 @@ st.set_page_config(
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 
-# Custom CSS Styling dinamis berdasarkan tema terpilih
+# Custom CSS Styling dinamis berdasarkan tema terpilih (Mendukung Responsivitas Ponsel, Efek Premium & Custom Global Theme)
 if st.session_state.theme == "dark":
     st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
         
+        /* 1. Reset Font Global & Warna Latar Belakang Seluruh Halaman */
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif;
         }
         
-        /* Card utama cuaca saat ini */
+        [data-testid="stAppViewContainer"] {
+            background-color: #0f172a !important; /* Latar belakang halaman abu mendung gelap */
+            color: #f8fafc !important;
+        }
+        
+        [data-testid="stSidebar"] {
+            background-color: #1e293b !important; /* Latar belakang sidebar */
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        /* 2. Judul Efek Gradien Premium */
+        .glow-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(to right, #00ffcc, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            font-size: 2.8rem;
+        }
+        
+        /* 3. Card utama cuaca saat ini */
         .main-card {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%);
             color: white;
             padding: 30px;
             border-radius: 24px;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             margin-bottom: 20px;
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .main-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(0, 255, 204, 0.12);
+            border-color: rgba(0, 255, 204, 0.3);
         }
         
         /* Grid metrik detail cuaca */
@@ -51,12 +77,19 @@ if st.session_state.theme == "dark":
         
         /* Card detail */
         .detail-card {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(30, 41, 59, 0.4);
             border-radius: 20px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(255, 255, 255, 0.1);
         }
         
         .metric-label {
@@ -83,14 +116,15 @@ if st.session_state.theme == "dark":
         
         /* Styling rekomendasi aktivitas */
         .recs-container {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px;
             padding: 20px;
             margin-top: 25px;
             margin-bottom: 25px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
         }
         .recs-title {
             font-size: 1rem;
@@ -112,19 +146,25 @@ if st.session_state.theme == "dark":
             font-weight: 600;
             display: flex;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: white;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease;
+        }
+        .recs-item:hover {
+            transform: scale(1.03);
         }
         .recs-item.warn {
             color: #ffcc00;
             border-color: rgba(255, 204, 0, 0.3);
             background: rgba(255, 204, 0, 0.05);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.1);
         }
         .recs-item.success {
             color: #00ffcc;
             border-color: rgba(0, 255, 204, 0.3);
             background: rgba(0, 255, 204, 0.05);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.1);
         }
     
         /* Styling horizontal scroll untuk card prakiraan */
@@ -146,8 +186,8 @@ if st.session_state.theme == "dark":
         }
         
         .forecast-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
             padding: 15px;
             min-width: 125px;
@@ -155,13 +195,15 @@ if st.session_state.theme == "dark":
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             flex-shrink: 0;
-            transition: transform 0.2s ease, background 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         .forecast-card:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+            background: rgba(30, 41, 59, 0.5);
+            border-color: rgba(0, 255, 204, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.1);
         }
         
         .forecast-time {
@@ -185,30 +227,113 @@ if st.session_state.theme == "dark":
             justify-content: center;
             line-height: 1.2;
         }
+        
+        /* Animasi mengambang untuk ikon cuaca */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        .weather-icon-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        /* Styling Streamlit Tabs */
+        button[data-baseweb="tab"] {
+            color: #cbd5e0 !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            color: #00ffcc !important;
+            border-bottom-color: #00ffcc !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Styling Expander Header */
+        [data-testid="stExpander"] {
+            border-radius: 16px !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            background-color: rgba(30, 41, 59, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Styling Button Micro-interaction */
+        div.stButton > button {
+            border-radius: 12px !important;
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            transition: all 0.2s ease !important;
+            font-weight: 600 !important;
+        }
+        div.stButton > button:hover {
+            transform: translateY(-1px) !important;
+            border-color: #00ffcc !important;
+            color: #00ffcc !important;
+            box-shadow: 0 4px 12px rgba(0, 255, 204, 0.15) !important;
+        }
+        
+        /* Media Queries untuk Responsivitas Ponsel */
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+            .main-card {
+                padding: 20px;
+            }
+        }
     </style>
     """, unsafe_allow_html=True)
 else:
     st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
         
+        /* 1. Reset Font Global & Warna Latar Belakang Seluruh Halaman */
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif;
         }
         
-        /* Card utama cuaca saat ini */
+        [data-testid="stAppViewContainer"] {
+            background-color: #f8fafc !important; /* Latar belakang halaman langit terang/bersih */
+            color: #0f172a !important;
+        }
+        
+        [data-testid="stSidebar"] {
+            background-color: #f1f5f9 !important; /* Latar belakang sidebar mode terang */
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+        
+        /* 2. Judul Efek Gradien Terang */
+        .glow-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(to right, #1e3a8a, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            font-size: 2.8rem;
+        }
+        
+        /* 3. Card utama cuaca saat ini */
         .main-card {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-            color: #2d3748;
+            background: linear-gradient(135deg, rgba(241, 245, 249, 0.9) 0%, rgba(226, 232, 240, 0.9) 100%);
+            color: #1e293b;
             padding: 30px;
             border-radius: 24px;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             margin-bottom: 20px;
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .main-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
         }
         
         /* Grid metrik detail cuaca */
@@ -220,17 +345,25 @@ else:
         
         /* Card detail */
         .detail-card {
-            background: rgba(0, 0, 0, 0.03);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 20px;
             padding: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            color: #1e293b;
+        }
+        .detail-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(0, 0, 0, 0.08);
         }
         
         .metric-label {
             font-size: 0.85rem;
-            color: #4a5568;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
@@ -245,26 +378,27 @@ else:
         
         .metric-subvalue {
             font-size: 1.2rem;
-            color: #2d3748;
+            color: #1e293b;
             font-weight: 600;
             margin-top: 5px;
         }
         
         /* Styling rekomendasi aktivitas */
         .recs-container {
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             border-radius: 20px;
             padding: 20px;
             margin-top: 25px;
             margin-bottom: 25px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03);
         }
         .recs-title {
             font-size: 1rem;
             font-weight: 600;
-            color: #4a5568;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 12px;
@@ -282,18 +416,24 @@ else:
             display: flex;
             align-items: center;
             border: 1px solid rgba(0, 0, 0, 0.05);
-            color: #2d3748;
-            background: rgba(0, 0, 0, 0.02);
+            color: #1e293b;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+        .recs-item:hover {
+            transform: scale(1.03);
         }
         .recs-item.warn {
-            color: #dd6b20;
-            border-color: rgba(221, 107, 32, 0.3);
-            background: rgba(221, 107, 32, 0.05);
+            color: #d97706;
+            border-color: rgba(217, 119, 6, 0.3);
+            background: rgba(217, 119, 6, 0.05);
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.05);
         }
         .recs-item.success {
-            color: #38a169;
-            border-color: rgba(56, 161, 105, 0.3);
-            background: rgba(56, 161, 105, 0.05);
+            color: #16a34a;
+            border-color: rgba(22, 163, 74, 0.3);
+            background: rgba(22, 163, 74, 0.05);
+            box-shadow: 0 0 10px rgba(22, 163, 74, 0.05);
         }
     
         /* Styling horizontal scroll untuk card prakiraan */
@@ -315,8 +455,8 @@ else:
         }
         
         .forecast-card {
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             border-radius: 16px;
             padding: 15px;
             min-width: 125px;
@@ -324,19 +464,21 @@ else:
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             flex-shrink: 0;
-            transition: transform 0.2s ease, background 0.2s ease;
-            color: #2d3748;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            color: #1e293b;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
         .forecast-card:hover {
-            transform: translateY(-2px);
-            background: rgba(0, 0, 0, 0.04);
-            border-color: rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08);
         }
         
         .forecast-time {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #4a5568;
+            color: #64748b;
         }
         .forecast-temp {
             font-size: 1.6rem;
@@ -346,13 +488,70 @@ else:
         }
         .forecast-desc {
             font-size: 0.8rem;
-            color: #4a5568;
+            color: #64748b;
             font-weight: 500;
             height: 2.4em;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1.2;
+        }
+        
+        /* Animasi mengambang untuk ikon cuaca */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        .weather-icon-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        /* Styling Streamlit Tabs */
+        button[data-baseweb="tab"] {
+            color: #64748b !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            color: #2b6cb0 !important;
+            border-bottom-color: #2b6cb0 !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Styling Expander Header */
+        [data-testid="stExpander"] {
+            border-radius: 16px !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        }
+        
+        /* Styling Button Micro-interaction */
+        div.stButton > button {
+            border-radius: 12px !important;
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+            transition: all 0.2s ease !important;
+            font-weight: 600 !important;
+        }
+        div.stButton > button:hover {
+            transform: translateY(-1px) !important;
+            border-color: #2b6cb0 !important;
+            color: #2b6cb0 !important;
+            box-shadow: 0 4px 12px rgba(43, 108, 176, 0.15) !important;
+        }
+        
+        /* Media Queries untuk Responsivitas Ponsel */
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+            .main-card {
+                padding: 20px;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
@@ -381,7 +580,7 @@ def render_forecast_cards(df_day) -> str:
     for _, row in df_day.iterrows():
         time_str = pd.to_datetime(row["datetime_local"]).strftime("%H:%M")
         icon_url = row["icon_url"]
-        icon_html = f'<img src="{icon_url}" width="42" style="margin: 5px 0; filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.3));">' if icon_url else ""
+        icon_html = f'<img src="{icon_url}" class="weather-icon-float" width="42" style="margin: 5px 0; filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.3));">' if icon_url else ""
         card = (
             f'<div class="forecast-card">'
             f'<div class="forecast-time">{time_str}</div>'
@@ -397,7 +596,7 @@ def render_forecast_cards(df_day) -> str:
         
     return f'<div class="forecast-card-container">{"".join(cards_html)}</div>'
 
-# Helper untuk membuat visualisasi grafik tren suhu (Plotly)
+# Helper untuk membuat visualisasi grafik tren suhu (Plotly dengan spline dan area fill)
 def render_temperature_chart(df_forecast):
     fig = px.line(
         df_forecast,
@@ -408,7 +607,15 @@ def render_temperature_chart(df_forecast):
         template="plotly_dark" if st.session_state.theme == "dark" else "plotly_white"
     )
     line_color = "#00ffcc" if st.session_state.theme == "dark" else "#2b6cb0"
-    fig.update_traces(line_color=line_color, line_width=3, mode="lines+markers")
+    fill_color = "rgba(0, 255, 204, 0.06)" if st.session_state.theme == "dark" else "rgba(43, 108, 176, 0.06)"
+    
+    fig.update_traces(
+        line=dict(color=line_color, width=3, shape="spline"),
+        mode="lines+markers",
+        fill="tozeroy",
+        fillcolor=fill_color,
+        marker=dict(size=6, color=line_color, symbol="circle")
+    )
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -418,8 +625,8 @@ def render_temperature_chart(df_forecast):
     )
     return fig
 
-# Header Aplikasi
-st.title("☀️ Weather Insight")
+# Header Aplikasi dengan Title Premium Glow
+st.markdown("<h1 class='glow-title'>☀️ Weather Insight</h1>", unsafe_allow_html=True)
 st.markdown("Aplikasi prakiraan cuaca real-time dengan data resmi dari BMKG.")
 st.markdown("---")
 
@@ -470,7 +677,6 @@ with st.sidebar:
             st.session_state.vill_val = fav_data["vill"]
             st.rerun()
     else:
-        # Empty State untuk lokasi favorit
         st.info("Belum ada kota favorit yang disimpan.")
         
     st.markdown("---")
@@ -479,11 +685,9 @@ with st.sidebar:
     st.markdown("### 📍 Pilih Wilayah")
     
     try:
-        # Fetch data Provinsi dengan loading indicator
         provinces = fetch_provinces()
         
         if not provinces:
-            # Empty State jika API datawilayah tidak mengembalikan data
             st.warning("🔍 Provinsi Tidak Ditemukan")
             st.info("Daftar wilayah kosong. Coba muat ulang halaman.")
         else:
@@ -497,7 +701,6 @@ with st.sidebar:
                 
             selected_prov_name = st.selectbox("Provinsi", prov_names, index=default_prov_idx)
             
-            # Reset state anak jika provinsi berubah
             if selected_prov_name != st.session_state.prov_val:
                 st.session_state.prov_val = selected_prov_name
                 st.session_state.reg_val = None
@@ -607,7 +810,6 @@ if target_code:
             raw_weather = fetch_weather(target_code)
             
             if not raw_weather:
-                # Empty State jika respons API BMKG kosong
                 st.warning("🔍 Data Prakiraan Cuaca Kosong")
                 st.info("BMKG tidak mengirim data cuaca untuk wilayah ini. Silakan coba wilayah lain.")
             else:
@@ -615,7 +817,6 @@ if target_code:
                 df_forecast = parse_weather_forecast(raw_weather)
                 
                 if df_forecast.empty:
-                    # Empty State jika DataFrame hasil parse kosong
                     st.warning("🔍 Data Prakiraan Cuaca Tidak Ditemukan")
                     st.info("Prakiraan cuaca kelurahan/desa ini belum diterbitkan oleh BMKG. Silakan pilih wilayah di sekitarnya.")
                 else:
@@ -637,11 +838,11 @@ if target_code:
                         
                         with col_left:
                             icon_url = current.get("icon_url")
-                            icon_html = f'<img src="{icon_url}" width="100" style="filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.4));">' if icon_url else ""
+                            icon_html = f'<img src="{icon_url}" class="weather-icon-float" width="100" style="filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.4));">' if icon_url else ""
                             
                             st.markdown(f"""
                             <div class="main-card">
-                                <div style="font-size: 1.1rem; color: #cbd5e0; font-weight: 500;">CUACA SAAT INI</div>
+                                <div style="font-size: 1.1rem; opacity: 0.8; font-weight: 500;">CUACA SAAT INI</div>
                                 <h2 style="margin: 5px 0 15px 0; font-weight: 700;">📍 {loc_info.get('desa', selected_village_name)}</h2>
                                 <div style="display: flex; align-items: center; gap: 20px;">
                                     {icon_html}
