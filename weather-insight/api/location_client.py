@@ -2,6 +2,7 @@ import requests
 import streamlit as st
 
 DATAWILAYAH_BASE_URL = "https://api.datawilayah.com/api"
+BMKG_BASE_URL = "https://api.bmkg.go.id/publik/prakiraan-cuaca"
 
 @st.cache_data(ttl=3600)  # Cache data selama 1 jam agar respons cepat dan hemat bandwidth
 def fetch_provinces() -> list:
